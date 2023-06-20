@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<error-handler name="global-error-handler" doc:id="fc0cbe37-aef0-4081-81e8-02fb50c01330" >
+<on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Incorrect data/format sent",
+	details: error.detailedDescription	
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Please check the URL",
+	details: error.detailedDescription	
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Please check the method",
+	details: error.detailedDescription	
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Not Acceptable",
+	details: error.detailedDescription	
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Unsupported media type",
+	details: error.detailedDescription
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Not Implemented",
+	details: error.detailedDescription
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ee8d75ec-21da-4aa4-879d-b7772969abba" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="e14b2995-7fba-4e9e-91e9-0068c07e2f32" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "System Error",
+	details: error.detailedDescription
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[502]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+            	
+</error-handler>
+	<sub-flow name="calculatorSub_Flow" doc:id="1aa1c638-ceed-435e-9fd7-6eb8811c5584" >
+		<raise-error doc:name="Raise error" doc:id="ce292e0d-25f3-4b51-9767-0689bc26bdac" type="APIKIT:BAD_REQUEST"/>
+		<raise-error doc:name="Raise error" doc:id="96e932ef-2dbd-42be-a911-5bb9d696b0be" type="APIKIT:NOT_FOUND"/>
+		<raise-error doc:name="Raise error" doc:id="ef825150-618c-45e0-8763-a32fee757b25" type="APIKIT:METHOD_NOT_ALLOWED"/>
+		<raise-error doc:name="Raise error" doc:id="f5e4e6df-4be8-41a1-95f4-4af696d8545b" type="APIKIT:NOT_ACCEPTABLE"/>
+		<raise-error doc:name="Raise error" doc:id="84ab6d4d-3a0a-4a78-a4ec-8083ee30c833" type="APIKIT:UNSUPPORTED_MEDIA_TYPE"/>
+		<raise-error doc:name="Raise error" doc:id="d33670ce-f28a-4f5d-b16e-684a9d50c666" type="APIKIT:NOT_IMPLEMENTED"/>
+		<raise-error doc:name="Raise error" doc:id="a77de1c4-3f5d-4ea9-a03e-e42be2ce4071" type="ANY"/>
+	</sub-flow>
+</mule>
